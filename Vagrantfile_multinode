@@ -1,0 +1,37 @@
+# 3-node cluster: node1 (192.168.56.11), node2 (192.168.56.12), node3 (192.168.56.13)
+# All nodes are on the same private network and can reach each other.
+
+NODES = [
+  { name: "node1", ip: "192.168.56.11" },
+  { name: "node2", ip: "192.168.56.12" },
+  { name: "node3", ip: "192.168.56.13" },
+]
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "hashicorp-education/ubuntu-24-04"
+  config.vm.box_version = "0.1.0"
+
+  NODES.each do |node|
+    config.vm.define node[:name] do |machine|
+      machine.vm.hostname = node[:name]
+      machine.vm.network "private_network", ip: node[:ip]
+
+      machine.vm.provider "virtualbox" do |vb|
+        vb.name   = node[:name]
+        vb.memory = "1024"
+        vb.cpus   = 2
+      end
+
+      # Populate /etc/hosts on every node so they can resolve each other by hostname
+      machine.vm.provision "shell", inline: <<-SHELL
+        set -e
+        # Remove stale entries added by previous provisions
+        sed -i '/# vagrant-cluster/d' /etc/hosts
+        # Add all cluster nodes
+        echo "192.168.56.11 node1 # vagrant-cluster" >> /etc/hosts
+        echo "192.168.56.12 node2 # vagrant-cluster" >> /etc/hosts
+        echo "192.168.56.13 node3 # vagrant-cluster" >> /etc/hosts
+      SHELL
+    end
+  end
+end

@@ -158,3 +158,24 @@ vagrant box remove hashicorp-education/ubuntu-24-04
 ---
 
 For more information, see the [Vagrant documentation](https://www.vagrantup.com/docs/).
+
+
+## Use a Specific Vagrantfile for the Multi-Node Cluster
+
+Start the multi-node environment:
+
+```sh
+VAGRANT_VAGRANTFILE=Vagrantfile_multinode vagrant up
+```
+
+Check the status of all nodes:
+
+```sh
+VAGRANT_VAGRANTFILE=Vagrantfile_multinode vagrant status
+```
+
+SSH into a specific node:
+
+```sh
+VAGRANT_VAGRANTFILE=Vagrantfile_multinode vagrant ssh node1
+```
